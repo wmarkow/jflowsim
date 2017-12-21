@@ -1,6 +1,7 @@
 package jflowsim.model.numerics.lbm;
 
 import jflowsim.model.numerics.UniformGrid;
+import jflowsim.model.numerics.utilities.GridNodeType;
 
 public abstract class LBMUniformGrid extends UniformGrid {
 
@@ -114,6 +115,10 @@ public abstract class LBMUniformGrid extends UniformGrid {
 
 	int nodeIndex = (y * this.nx + x) * 9;
 
+	if (this.getType(x, y) == GridNodeType.GAS) {
+	    return 1.0;
+	}
+
 	return this.ftemp[nodeIndex + LbEQ.ZERO] + this.ftemp[nodeIndex + LbEQ.E] + this.ftemp[nodeIndex + LbEQ.W]
 		+ this.ftemp[nodeIndex + LbEQ.N] + this.ftemp[nodeIndex + LbEQ.S] + this.ftemp[nodeIndex + LbEQ.NE]
 		+ this.ftemp[nodeIndex + LbEQ.SW] + this.ftemp[nodeIndex + LbEQ.NW] + this.ftemp[nodeIndex + LbEQ.SE];
@@ -123,6 +128,10 @@ public abstract class LBMUniformGrid extends UniformGrid {
 
 	int nodeIndex = (y * this.nx + x) * 9;
 
+	if (this.getType(x, y) == GridNodeType.GAS) {
+	    return 0.0;
+	}
+
 	return (this.f[nodeIndex + LbEQ.E] - this.f[nodeIndex + LbEQ.W] + this.f[nodeIndex + LbEQ.NE]
 		- this.f[nodeIndex + LbEQ.SW] + this.f[nodeIndex + LbEQ.SE] - this.f[nodeIndex + LbEQ.NW])
 		/ getDensity(x, y);
@@ -131,6 +140,10 @@ public abstract class LBMUniformGrid extends UniformGrid {
     public double getVeloY(int x, int y) {
 
 	int nodeIndex = (y * this.nx + x) * 9;
+
+	if (this.getType(x, y) == GridNodeType.GAS) {
+	    return 0.0;
+	}
 
 	return (+this.f[nodeIndex + LbEQ.N] - this.f[nodeIndex + LbEQ.S] + this.f[nodeIndex + LbEQ.NE]
 		+ this.f[nodeIndex + LbEQ.NW] - this.f[nodeIndex + LbEQ.SE] - this.f[nodeIndex + LbEQ.SW])
