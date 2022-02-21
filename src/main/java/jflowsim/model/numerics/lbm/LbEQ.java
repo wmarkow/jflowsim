@@ -25,8 +25,14 @@ public class LbEQ {
     public static final int ey[] = {0, 0, 0, 1, -1, 1, -1, 1, -1};
     // inverse directory
     public static final int invdir[] = {0, 2, 1, 4, 3, 6, 5, 8, 7};
-    // weighting factors D2Q9
+
+    /***
+     * Weighting factors D2Q9.
+     * 
+     * @see Rettinger_BT_2013.pdf page 5
+     */
     public static double w[] = {4. / 9., 1. / 9., 1. / 9., 1. / 9., 1. / 9., 1. / 36., 1. / 36., 1. / 36., 1. / 36.};
+
     // weighting factors D2Q5
     public static double wT[] = {1. / 3., 1. / 6., 1. / 6., 1. / 6., 1. / 6.};
 
@@ -64,6 +70,21 @@ public class LbEQ {
         }
     }
 
+    /***
+     * A BGK equilibrium function.
+     * 
+     * @see Rettinger_BT_2013.pdf page 5
+     * @see Sukop_Lattice_Boltzmann_method_for_modeling_liquid_and_vapor_interface.pdf page 3
+     * @see report930.pdf page 3
+     * @param rho
+     *            a density
+     * @param vx
+     *            a velocity part along X axis
+     * @param vy
+     *            a velocity part along Y axis
+     * @param f
+     *            a table that holds 9 values (for each direction)
+     */
     public static void getBGKEquilibrium(double rho, double vx, double vy, double f[]) {
         f[ZERO] = c4o9 * rho * (1. - 1.5 * (vx * vx + vy * vy));
         f[E] = c1o9 * rho * (1. + 3.0 * vx + 4.5 * vx * vx - 1.5 * (vx * vx + vy * vy));

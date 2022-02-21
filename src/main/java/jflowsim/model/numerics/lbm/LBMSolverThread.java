@@ -1,10 +1,10 @@
 package jflowsim.model.numerics.lbm;
 
-import jflowsim.model.numerics.Solver;
-import jflowsim.model.numerics.lbm.navierstokes.LBMNavierStokesGrid;
-import jflowsim.model.numerics.utilities.GridNodeType;
 import java.util.concurrent.CyclicBarrier;
+
 import jflowsim.model.numerics.BoundaryCondition;
+import jflowsim.model.numerics.Solver;
+import jflowsim.model.numerics.utilities.GridNodeType;
 
 /* ======================================================================================= */
 /* ======================================================================================= */
@@ -35,7 +35,7 @@ public abstract class LBMSolverThread extends Thread {
 
     /* ======================================================================================= */
     protected void applyBCsNEW() {
-        LBMUniformGrid myGrid = (LBMUniformGrid) grid;
+        LBMUniformGrid myGrid = grid;
 
         for (BoundaryCondition bc : myGrid.bcList) {
             bc.apply();
@@ -44,6 +44,12 @@ public abstract class LBMSolverThread extends Thread {
 
     }
     /* ======================================================================================= */
+    /***
+     * It looks that this code is copied from {@link LBMSolver#collision(double)}. Is it a collision operator
+     * by BGK model?
+     * 
+     * @param s_nu
+     */
     protected void collision(double s_nu) {
         double[] feq = new double[9];
         int nodeIndex = -1;
@@ -56,7 +62,7 @@ public abstract class LBMSolverThread extends Thread {
                     nodeIndex = (i + j * grid.nx) * 9;
 
                     if (grid.getType(i, j) != GridNodeType.SOLID) {
-
+                        // A node different than SOLID calculate a real collision
                         double dens = grid.f[nodeIndex + LbEQ.ZERO]
                                 + grid.f[nodeIndex + LbEQ.E]
                                 + grid.f[nodeIndex + LbEQ.W]
@@ -82,14 +88,19 @@ public abstract class LBMSolverThread extends Thread {
                                 - grid.f[nodeIndex + LbEQ.SE]
                                 - grid.f[nodeIndex + LbEQ.SW]) / dens;
 
+                        // Calculate "feq" part of BGK collision operator and store it in feq variable
                         LbEQ.getBGKEquilibrium(dens, vx, vy, feq);
 
                         for (int dir = 0; dir < 9; dir++) {
+                            // Here we have a collision equation of LBM.
+                            // ftemp(x,t) = f(x,t) + omega(x,t)
+                            // where two last terms below is actually a "BGK collision operator" (a
+                            // phenomenological equation)
                             grid.ftemp[nodeIndex + dir] = grid.f[nodeIndex + dir] - s_nu * (grid.f[nodeIndex + dir] - feq[dir]);
                         }
 
                     } else {
-                        //nodal bounce back
+                        // Here we have a SOLID cell/node type: bounce back
                         for (int dir = 1; dir < 9; dir++) {
                             grid.ftemp[nodeIndex + dir] = grid.f[nodeIndex + LbEQ.invdir[dir]];
                         }
@@ -106,6 +117,12 @@ public abstract class LBMSolverThread extends Thread {
     }
     /* ======================================================================================= */
 
+    /***
+     * Is it a collision operator by MRT model?
+     * 
+     * @see Rettinger_BT_2013.pdf page 6
+     * @param s_nu
+     */
     protected void collisionMRT(double s_nu) {
         double[] feq = new double[9];
         int nodeIndex = -1;

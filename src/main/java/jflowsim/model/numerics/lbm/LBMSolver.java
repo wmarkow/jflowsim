@@ -1,9 +1,10 @@
 package jflowsim.model.numerics.lbm;
 
+import java.util.ArrayList;
+
 import jflowsim.model.numerics.Solver;
 import jflowsim.model.numerics.UniformGrid;
 import jflowsim.model.numerics.utilities.GridNodeType;
-import java.util.ArrayList;
 
 public abstract class LBMSolver extends Solver {
 
@@ -32,6 +33,7 @@ public abstract class LBMSolver extends Solver {
         }
     }
 
+    @Override
     public void interrupt() {
 
         for (int i = 0; i < threadList.size(); i++) {
@@ -42,6 +44,13 @@ public abstract class LBMSolver extends Solver {
         this.thread.interrupt();
     }
 
+    /***
+     * A collision step implementation.
+     * 
+     * @see The_Lattice_Boltzmann_Equation_Method.pdf page 4
+     * @param s_nu
+     *            is this a 1/relaxation_time?
+     */
     protected void collision(double s_nu) {
         double[] feq = new double[9];
         int nodeIndex = -1;
@@ -52,7 +61,7 @@ public abstract class LBMSolver extends Solver {
                 nodeIndex = (i + j * grid.nx) * 9;
 
                 if (grid.getType(i, j) != GridNodeType.SOLID) {
-
+                    // A node different than SOLID calculate a real collision
                     double dens = grid.f[nodeIndex + LbEQ.ZERO]
                             + grid.f[nodeIndex + LbEQ.E]
                             + grid.f[nodeIndex + LbEQ.W]
@@ -78,14 +87,19 @@ public abstract class LBMSolver extends Solver {
                             - grid.f[nodeIndex + LbEQ.SE]
                             - grid.f[nodeIndex + LbEQ.SW]) / dens;
 
+                    // Calculate "feq" part of BGK collision operator and store it in feq variable
                     LbEQ.getBGKEquilibrium(dens, vx, vy, feq);
 
                     for (int dir = 0; dir < 9; dir++) {
+                        // Here we have a collision equation of LBM.
+                        // ftemp(x,t) = f(x,t) + omega(x,t)
+                        // where two last terms below is actually a "BGK collision operator" (a
+                        // phenomenological equation)
                         grid.ftemp[nodeIndex + dir] = grid.f[nodeIndex + dir] - s_nu * (grid.f[nodeIndex + dir] - feq[dir]);
                     }
 
                 } else {
-                    //nodal bounce back
+                    // Here we have a SOLID cell/node type: bounce back
                     for (int dir = 1; dir < 9; dir++) {
                         grid.ftemp[nodeIndex + dir] = grid.f[nodeIndex + LbEQ.invdir[dir]];
                     }
