@@ -3,6 +3,7 @@ package jflowsim.controller.solverbuilder;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import jflowsim.model.numerics.lbm.distiller.DistillerSolver;
 import jflowsim.model.numerics.lbm.freesurface.LBMFreeSurfaceSolver;
 import jflowsim.model.numerics.lbm.navierstokes.LBMNavierStokesSolver;
 import jflowsim.model.numerics.lbm.shallowwater.LBMShallowWaterSolver;
@@ -19,6 +20,7 @@ public class SolverFactory {
         builderSet.put(LBMTemperatureSolver.class.getSimpleName(), new LBMTemperatureBuilder());
         builderSet.put(LBMShallowWaterSolver.class.getSimpleName(), new LBMShallowWaterBuilder());
         // builderSet.put( AcmSolver.class.getSimpleName(), new AcmBuilder() );
+	builderSet.put(DistillerSolver.class.getSimpleName(), new DistillerBuilder());
     }
 
     public static SolverFactory getInstance() {
