@@ -66,7 +66,7 @@ public class DistillerSolver extends LBMSolver {
 		    // f hat werte nach der propagation
 		    this.calcNewFill();
 		    barrier.await();
-		    this.setNewNodeStates();
+		    this.setNewNodeTypes();
 		    barrier.await();
 		    this.condenseLostInterfaceCells();
 		    barrier.await();
@@ -116,14 +116,14 @@ public class DistillerSolver extends LBMSolver {
 
 			for (int dir = 1; dir < 9; dir++) {
 
-			    int neighborState = myGrid.getType(i + LbEQ.ex[dir], j + LbEQ.ey[dir]);
+			    int neighborType = myGrid.getType(i + LbEQ.ex[dir], j + LbEQ.ey[dir]);
 			    double neighborFill = myGrid.getFill(i + LbEQ.ex[dir], j + LbEQ.ey[dir]);
 
 			    double faceFill = 0.0;
 
-			    if (neighborState == GridNodeType.FLUID) {
+			    if (neighborType == GridNodeType.FLUID) {
 				faceFill = 1.0;
-			    } else if (neighborState == GridNodeType.INTERFACE) {
+			    } else if (neighborType == GridNodeType.INTERFACE) {
 				faceFill = 0.5 * (neighborFill + oldFill);
 			    }
 
@@ -140,7 +140,7 @@ public class DistillerSolver extends LBMSolver {
 	    }
 	}
 
-	private void setNewNodeStates() {
+	private void setNewNodeTypes() {
 
 	    DistillerGrid myGrid = (DistillerGrid) grid;
 

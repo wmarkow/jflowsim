@@ -17,8 +17,8 @@ import jflowsim.model.numerics.utilities.Scalar;
 import jflowsim.view.headupdisplay.HeadUpDisplay;
 
 public class DistillerGrid extends LBMUniformGrid {
-    double[] fill;
-    double[] tempfill;
+    private double[] fill;
+    private double[] tempfill;
 
     public DistillerGrid(double _length, double _width, double _dx) {
 	super(_length, _width, _dx);
