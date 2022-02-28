@@ -18,19 +18,21 @@ public class DistillerTestCase extends TestCase {
 
     @Override
     public UniformGrid getGrid() {
-	DistillerGrid grid = new DistillerGrid(0.5 /* length */, 0.5 /* width */, 0.005 /* dx */);
+	DistillerGrid grid = new DistillerGrid(0.05 /* length */, 0.5 /* width */, 0.001 /* dx */);
 
 	grid.testcase = this.getClass().getSimpleName();
 
 	grid.setLBParameters(0.05 /* nue_lbm */, 0.0 /* forcingX */, -0.0002 /* forcingY */);
 
+	// Fill the whole grid with GAS
 	for (int i = 0; i < grid.nx * grid.ny; i++) {
 	    grid.type[i] = GridNodeType.GAS;
 	}
 
+	// Put the drop at the top of the column
 	int dropCenterX = (int) (0.50 * grid.nx);
-	int dropCenterY = (int) (0.50 * grid.ny);
-	int dropRadius = (int) (0.25 * grid.nx);
+	int dropCenterY = (int) (0.90 * grid.ny);
+	int dropRadius = (int) (0.30 * grid.nx);
 
 	for (int x = 0; x < grid.nx; x++) {
 	    for (int y = 0; y < grid.ny; y++) {
@@ -44,20 +46,24 @@ public class DistillerTestCase extends TestCase {
 	    }
 	}
 
+	// Create an interface between fluid and gas.
 	for (int x = 0; x < grid.nx; x++) {
 	    for (int y = 0; y < grid.ny; y++) {
+		// Iterate over the whole grid.
 
 		if (grid.getType(x, y) == GridNodeType.FLUID) {
-
+		    // We have a FLUID node...
 		    Boolean changeToInterface = false;
 
 		    for (int dir = 0; dir < 9; dir++) {
 			if (grid.getType(x + LbEQ.ex[dir], y + LbEQ.ey[dir]) == GridNodeType.GAS) {
+			    // ...which has a direct contact to GAS...
 			    changeToInterface = true;
 			}
 		    }
 
 		    if (changeToInterface) {
+			// .. change it to interface
 			grid.setType(x, y, GridNodeType.INTERFACE);
 			grid.setFill(x, y, 0.5);
 		    }
@@ -65,19 +71,38 @@ public class DistillerTestCase extends TestCase {
 	    }
 	}
 
+	// put some BOUNDARY line (it doesn't work with SOLID)
+	for (int y = (int) (0.25 * grid.ny); y < (int) (0.5 * grid.ny); y++) {
+
+	    int beginX = y % 2;
+	    for (int x = beginX; x < grid.nx; x += 5) {
+
+		grid.setType(x, y, GridNodeType.BOUNDARY);
+		// grid.setType(x + 1, y - 1, GridNodeType.BOUNDARY);
+		// grid.setType(x + 2, y - 2, GridNodeType.BOUNDARY);
+	    }
+
+	    y += 2;
+	}
+
 	// Boundary conditions
 	for (int x = 0; x < grid.nx; x++) {
+	    // bottom edge of the column
 	    grid.type[x] = GridNodeType.BOUNDARY;
+	    // top edge of the column
 	    grid.type[x + (grid.ny - 1) * grid.nx] = GridNodeType.BOUNDARY;
 	}
 	for (int y = 0; y < grid.ny; y++) {
-
+	    // left side of the column
 	    grid.type[0 + y * grid.nx] = GridNodeType.BOUNDARY;
+	    // right side of the column
 	    grid.type[grid.nx - 1 + y * grid.nx] = GridNodeType.BOUNDARY;
 	}
 
+	grid.viscosity = 0.05;
 	grid.dv = grid.viscosity / grid.nue_lbm * grid.nx / grid.getLength();
 
+	// Initial conditions. Fill every node with initial BGK state.
 	for (int i = 0; i < grid.nx; i++) {
 	    for (int j = 0; j < grid.ny; j++) {
 
