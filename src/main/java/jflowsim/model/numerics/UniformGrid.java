@@ -59,7 +59,9 @@ public abstract class UniformGrid {
     public double gravity = 9.81;
 
     /***
-     * ?
+     * Used as a hint on how often update the statistics information (i.e. by
+     * calling {@link Solver#update()}. This is expressed in a discrete time step
+     * unit.
      */
     public int updateInterval = 25;
 
