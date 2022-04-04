@@ -49,8 +49,35 @@ public class DistillerSolver extends LBMSolver {
 		    if (myrank == 0) {
 			grid.timestep++;
 			counter++;
+
+			DistillerGrid distGrid = (DistillerGrid) grid;
+			double totalFill = 0;
+			int numberOfLiquid = 0;
+			int numberOfInterface = 0;
+			int numberOfGas = 0;
+			if (grid.timestep % 100 == 0) {
+			    for (int x = 0; x < grid.nx; x++) {
+				for (int y = 0; y < grid.ny; y++) {
+				    totalFill += distGrid.getFill(x, y);
+
+				    int type = distGrid.getType(x, y);
+				    if (type == GridNodeType.FLUID) {
+					numberOfLiquid++;
+				    } else if (type == GridNodeType.INTERFACE) {
+					numberOfInterface++;
+				    } else if (type == GridNodeType.GAS) {
+					numberOfGas++;
+				    }
+				}
+			    }
+
+			    System.out.println(String.format("Total fill = %s, fliuds = %s, interface = %s, gas = %s",
+				    totalFill, numberOfLiquid, numberOfInterface, numberOfGas));
+			}
 		    }
 
+		    // The steps below are very similar as in the document below:
+		    // @see 1-s2.0-S0898122111001684-main.pdf page 3557
 		    collision(s_nu);
 
 		    addForcing();
@@ -99,6 +126,9 @@ public class DistillerSolver extends LBMSolver {
 	    }
 	}
 
+	/***
+	 * @see 1-s2.0-S0898122111001684-main.pdf
+	 */
 	private void calcNewFill() {
 
 	    DistillerGrid myGrid = (DistillerGrid) grid;
@@ -119,6 +149,7 @@ public class DistillerSolver extends LBMSolver {
 			    int neighborType = myGrid.getType(i + LbEQ.ex[dir], j + LbEQ.ey[dir]);
 			    double neighborFill = myGrid.getFill(i + LbEQ.ex[dir], j + LbEQ.ey[dir]);
 
+			    // See page 3553 Eq. 3.7
 			    double faceFill = 0.0;
 
 			    if (neighborType == GridNodeType.FLUID) {
@@ -132,6 +163,7 @@ public class DistillerSolver extends LBMSolver {
 			    dm += faceFill * (myGrid.f[nodeIndex + LbEQ.invdir[dir]] - myGrid.ftemp[nodeIndex + dir]);
 			}
 
+			// See page 3553 Eq. 3.8
 			double newFill = (oldFill * myGrid.getDensityTemp(i, j) + dm) / myGrid.getDensity(i, j);
 
 			myGrid.setTempFill(i, j, newFill);
@@ -229,11 +261,17 @@ public class DistillerSolver extends LBMSolver {
 			// First case: no gas neighbors, entrapped interface cell
 			if (gasCounter == 0) {
 			    myGrid.setType(i, j, GridNodeType.FLUID);
+			    System.out.println("Change to FLUID");
 			}
 
 			// Second case: no fluid neighbors, entrapped interface cell
 			if (fluidCounter == 0) {
 			    myGrid.setType(i, j, GridNodeType.GAS);
+			    System.out.println("Change to GAS");
+			}
+
+			if (interfaceCounter == 0) {
+			    System.out.println("interfaceCounter is ZERO");
 			}
 		    }
 		}

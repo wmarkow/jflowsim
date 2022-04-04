@@ -14,23 +14,29 @@ import jflowsim.model.numerics.lbm.distiller.DistillerGrid;
 import jflowsim.model.numerics.lbm.testcases.TestCase;
 import jflowsim.model.numerics.utilities.GridNodeType;
 
-public class DistillerSmallDropTestCase extends TestCase {
+public class BreakingDamTestCase extends TestCase {
 
     @Override
     public UniformGrid getGrid() {
-	DistillerGrid grid = new DistillerGrid(0.05 /* length */, 0.15 /* width */, 0.001 /* dx */);
+	double dx = 0.002;
+	DistillerGrid grid = new DistillerGrid(0.5715 /* length */, 0.142875 /* height */, dx /* dx */);
 
 	grid.testcase = this.getClass().getSimpleName();
 
-	grid.setLBParameters(0.05 /* nue_lbm */, 0.0 /* forcingX */, -0.0002 /* forcingY */);
+	grid.setLBParameters(0.005 /* nue_lbm */, 0.0 /* forcingX */, -0.001 /* forcingY */);
 
 	// Fill the whole grid with GAS
 	for (int i = 0; i < grid.nx * grid.ny; i++) {
 	    grid.type[i] = GridNodeType.GAS;
 	}
 
-	for (int x = 18; x <= 32; x++) {
-	    for (int y = 130; y <= 140; y++) {
+	// fill with water
+	int startX = 1;
+	int startY = 1;
+	int endX = (int) (0.05715 / dx);
+	int endY = (int) (0.1143 / dx);
+	for (int x = startX; x <= endX; x++) {
+	    for (int y = startY; y <= endY; y++) {
 		grid.setType(x, y, GridNodeType.FLUID);
 		grid.setFill(x, y, 1.0);
 	    }
@@ -92,6 +98,7 @@ public class DistillerSmallDropTestCase extends TestCase {
 		    grid.f[(i + j * grid.nx) * 9 + dir] = feq[dir];
 		    grid.ftemp[(i + j * grid.nx) * 9 + dir] = feq[dir];
 		}
+
 	    }
 	}
 

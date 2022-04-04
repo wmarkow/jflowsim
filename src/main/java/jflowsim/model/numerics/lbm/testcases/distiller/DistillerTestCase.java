@@ -18,11 +18,11 @@ public class DistillerTestCase extends TestCase {
 
     @Override
     public UniformGrid getGrid() {
-	DistillerGrid grid = new DistillerGrid(0.05 /* length */, 0.5 /* width */, 0.001 /* dx */);
+	DistillerGrid grid = new DistillerGrid(0.05 /* length */, 0.5 /* width */, 0.0015 /* dx */);
 
 	grid.testcase = this.getClass().getSimpleName();
 
-	grid.setLBParameters(0.05 /* nue_lbm */, 0.0 /* forcingX */, -0.0002 /* forcingY */);
+	grid.setLBParameters(0.1 /* nue_lbm */, 0.0 /* forcingX */, -0.0002 /* forcingY */);
 
 	// Fill the whole grid with GAS
 	for (int i = 0; i < grid.nx * grid.ny; i++) {
@@ -74,15 +74,15 @@ public class DistillerTestCase extends TestCase {
 	// put some BOUNDARY line (it doesn't work with SOLID)
 	for (int y = (int) (0.25 * grid.ny); y < (int) (0.5 * grid.ny); y++) {
 
-	    int beginX = y % 2;
-	    for (int x = beginX; x < grid.nx; x += 5) {
+	    int beginX = y % 4;
+	    for (int x = beginX; x < grid.nx; x += 4) {
 
 		grid.setType(x, y, GridNodeType.BOUNDARY);
 		// grid.setType(x + 1, y - 1, GridNodeType.BOUNDARY);
 		// grid.setType(x + 2, y - 2, GridNodeType.BOUNDARY);
 	    }
 
-	    y += 2;
+	    y += 4;
 	}
 
 	// Boundary conditions

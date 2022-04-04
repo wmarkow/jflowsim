@@ -76,7 +76,8 @@ public abstract class UniformGrid {
     public double real_time; // real in secs
 
     /***
-     * MNU per seconds? What is this?
+     * Million Node Updates Per Second. For performance statistics usage. Tells how
+     * many million nodes are processed in one second.
      */
     public double mnups;
 

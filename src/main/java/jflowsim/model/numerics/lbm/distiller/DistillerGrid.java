@@ -17,6 +17,17 @@ import jflowsim.model.numerics.utilities.Scalar;
 import jflowsim.view.headupdisplay.HeadUpDisplay;
 
 public class DistillerGrid extends LBMUniformGrid {
+    /***
+     * Fill level of the cell/node. I'm not quite sure: it tells home much of liquid
+     * exist in the cell:
+     * <ul>
+     * <li>0.0 means we have a gas cell</li>
+     * <li>(0.0, 1.0) means we have an liquid-interface cell</li>
+     * <li>1.0 means we have a liquid</li>
+     * </ul>
+     * 
+     * @see parcfdabstract.pdf page 1
+     */
     private double[] fill;
     private double[] tempfill;
 

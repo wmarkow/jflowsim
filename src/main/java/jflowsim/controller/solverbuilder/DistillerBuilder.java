@@ -12,6 +12,7 @@ import jflowsim.model.numerics.Solver;
 import jflowsim.model.numerics.UniformGrid;
 import jflowsim.model.numerics.lbm.distiller.DistillerSolver;
 import jflowsim.model.numerics.lbm.testcases.TestCase;
+import jflowsim.model.numerics.lbm.testcases.distiller.BreakingDamTestCase;
 import jflowsim.model.numerics.lbm.testcases.distiller.DistillerSmallDropTestCase;
 import jflowsim.model.numerics.lbm.testcases.distiller.DistillerTestCase;
 
@@ -20,6 +21,7 @@ public class DistillerBuilder extends SolverBuilder {
     public DistillerBuilder() {
 	testCaseSet.put(DistillerTestCase.class.getSimpleName(), new DistillerTestCase());
 	testCaseSet.put(DistillerSmallDropTestCase.class.getSimpleName(), new DistillerSmallDropTestCase());
+	testCaseSet.put(BreakingDamTestCase.class.getSimpleName(), new BreakingDamTestCase());
     }
 
     @Override
